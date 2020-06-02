@@ -48,6 +48,7 @@ require("./src/midi/abc_midi_ui_generator");
 
 var midi = require('./src/midi/abc_midi_controls');
 abcjs.midi = {
+	setupMidi: midi.setupMidi,
 	setSoundFont: midi.setSoundFont,
 	startPlaying: midi.startPlaying,
 	restartPlaying: midi.restartPlaying,
