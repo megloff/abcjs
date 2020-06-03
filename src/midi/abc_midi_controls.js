@@ -222,10 +222,34 @@ var midi = {};
         return instruments;
     }
 
+    var setupMidiTimer;
+
     midi.setupMidi = function (config) {
-        return MIDI.setup(config).then(function () {
-            midiJsInitialized = true;
+        var promise = new Promise(function (resolve, reject) {
+            MIDI.setup(config).then(function () {
+                clearTimeout(setupMidiTimer);
+                setupMidiTimer = null;
+                midiJsInitialized = true;
+                resolve();
+            }).catch((err) => {
+                clearTimeout(setupMidiTimer);
+                setupMidiTimer = null;
+                clearTimeout(setupMidiTimer);
+                reject(err);
+            });
+
+            if (setupMidiTimer) {
+                clearTimeout(setupMidiTimer);
+            }
+
+            setupMidiTimer = setTimeout(function() {
+                if (setupMidiTimer) {
+                    reject("MIDI setup timeout error");
+                }
+            }, 500);
         });
+
+        return promise;
     }
 
     function setCurrentMidiTune(timeWarp, data, onSuccess) {
